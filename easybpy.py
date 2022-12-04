@@ -40,14 +40,11 @@ import random
 def set_render_engine_to_cycles():
     get_scene().render.engine = 'CYCLES'
 
-def set_render_engine_cycles():
-    set_render_engine_to_cycles()
-
 def set_render_engine_to_eevee():
     get_scene().render.engine = 'BLENDER_EEVEE'
 
-def set_render_engine_eevee():
-    set_render_engine_to_eevee()
+set_render_engine_cycles = set_render_engine_to_cycles
+set_render_engine_eevee = set_render_engine_to_eevee
 
 def render_image(use_view = False):
     bpy.ops.render.render(use_viewport=use_view)
@@ -75,14 +72,13 @@ def render_resolution(x = None, y = None):
 def set_render_resolution_percentage(percent):
     get_scene().render.resolution_percentage = percent
 
-def set_render_percentage(percent = None):
-    set_render_resolution_percentage(percent)
-
-def set_render_percent(percent = None):
-    set_render_resolution_percentage(percent)
-
 def get_render_resolution_percentage():
     return get_scene().render.resolution_percentage
+
+set_render_percentage = set_render_resolution_percentage
+set_render_percent = set_render_resolution_percentage
+get_render_percentage = get_render_resolution_percentage
+get_render_percent = get_render_resolution_percentage
 
 def render_resolution_percentage(percent = None):
     if percent is not None:
@@ -106,41 +102,36 @@ def render_aspect_ratio(x = None, y = None):
     else:
         return get_render_pixel_aspect_ratio()
 
+def set_current_frame(val):
+    get_scene().frame_current = val
+
+def set_start_frame(val):
+    get_scene().frame_start = val
+
+def set_end_frame(val):
+    get_scene().frame_end = val
+
+set_frame = set_current_frame
+set_frame_start = set_start_frame
+set_frame_end = set_end_frame
+
 def current_frame(val = None):
     if val is None:
         return get_scene().frame_current
     else:
-        get_scene().frame_current = val
-
-def set_frame(val = None):
-    current_frame(val)
+        set_current_frame(val)
 
 def frame_start(val = None):
     if val is None:
         return get_scene().frame_start
     else:
-        get_scene().frame_start = val
+        set_start_frame(val)
 
 def frame_end(val = None):
     if val is None:
         return get_scene().frame_end
     else:
-        get_scene().frame_end = val
-
-def set_current_frame(val = None):
-    current_frame(val)
-
-def set_frame_start(val = None):
-    frame_start(val)
-
-def set_frame_end(val = None):
-    frame_end(val)
-
-def set_start_frame(val = None):
-    frame_start(val)
-
-def set_end_frame(val = None):
-    frame_end(val)
+        set_end_frame(val)
 
 def set_frame_interval(start = None, end = None):
     frame_start(start)
@@ -313,29 +304,26 @@ def set_active_object(ref=None):
 def clear_active_object():
     bpy.context.view_layer.objects.active = None
 
-def active_object():
-    return get_active_object()
+def get_selected_objects():
+    return bpy.context.selected_objects
 
-def get_selected_object():
+#NOTE: These are currently inconsistent with the get-if-no-arguments/set-if-there-is pattern established on other functions 
+def active_object(): 
     return get_active_object()
 
 def selected_object():
     return get_selected_object()
 
-def ao():
-    return get_active_object()
-
-def so():
-    return get_selected_objects()
-
-def get_selected_objects():
-    return bpy.context.selected_objects
+#NOTE: Having "selected_object" be an alias to the active object feels a bit of an anti-pattern especially when "selected_objects" refer to a different thing
+get_selected_object = get_active_object
+ao = get_active_object
+so = get_selected_objects
+selected_objects = get_selected_objects
 
 def get_all_objects():
     return bpy.data.objects
 
-def get_list_of_objects():
-    get_all_objects()
+get_list_of_objects = get_all_objects
 
 def select_object(ref, make_active=True):
     objref = get_object(ref)
@@ -347,9 +335,6 @@ def select_objects(ref):
     objref = get_objects(ref)
     for o in objref:
         o.select_set(True)
-
-def selected_objects():
-    return get_selected_objects()
 
 def select_all_objects(col = None):
     if col == None:
@@ -417,9 +402,6 @@ def get_object(ref):
             objref = ref
     return objref
 
-def get_obj(ref):
-    return get_object(ref)
-
 def get_objects(ref = None):
     objref = []
     if ref is None:
@@ -440,8 +422,8 @@ def get_objects(ref = None):
             objref.append(ref)
     return objref
 
-def get_objs(ref = None):
-    return get_objects(ref)
+get_obj = get_object
+get_objs = get_objects
 
 def get_median_point_of_objects(objs):
     point_loc = Vector()
@@ -653,9 +635,6 @@ def create_uv_sphere():
     bpy.ops.mesh.primitive_uv_sphere_add()
     return active_object()
 
-def create_sphere():
-    return create_uv_sphere()
-
 def create_ico_sphere():
     bpy.ops.mesh.primitive_ico_sphere_add()
     return active_object()
@@ -676,16 +655,13 @@ def create_suzanne():
     bpy.ops.mesh.primitive_monkey_add()
     return active_object()
 
-def create_monkey():
-    return create_suzanne()
+create_sphere = create_uv_sphere
+create_monkey = create_suzanne
 
 # Curve
 def create_bezier_curve():
     bpy.ops.curve.primitive_bezier_curve_add()
     return active_object()
-
-def create_bezier():
-    return create_bezier_curve()
 
 def create_circle_curve():
     bpy.ops.curve.primitive_bezier_circle_add()
@@ -703,23 +679,17 @@ def create_nurbs_path():
     bpy.ops.curve.primitive_nurbs_path_add()
     return active_object()
 
-def create_path():
-    return create_nurbs_path()
+create_bezier = create_bezier_curve
+create_path = create_nurbs_path
 
 # Surface
 def create_nurbs_curve_surface():
     bpy.ops.surface.primitive_nurbs_surface_curve_add()
     return active_object()
 
-def create_curve_surface():
-    return create_nurbs_curve_surface()
-
 def create_nurbs_circle_surface():
     bpy.ops.surface.primitive_nurbs_surface_circle_add()
     return active_object()
-
-def create_circle_surface():
-    return create_nurbs_circle_surface()
 
 def create_nurbs_surface():
     bpy.ops.surface.primitive_nurbs_surface_surface_add()
@@ -729,22 +699,19 @@ def create_nurbs_cylinder_surface():
     bpy.ops.surface.primitive_nurbs_surface_cylinder_add()
     return active_object()
 
-def create_cylinder_surface():
-    return create_nurbs_cylinder_surface()
-
 def create_nurbs_sphere_surface():
     bpy.ops.surface.primitive_nurbs_surface_sphere_add()
     return active_object()
-
-def create_sphere_surface():
-    return create_nurbs_sphere_surface()
 
 def create_nurbs_torus_surface():
     bpy.ops.surface.primitive_nurbs_surface_torus_add()
     return active_object()
 
-def create_torus_surface():
-    return create_nurbs_torus_surface()
+create_curve_surface = create_nurbs_curve_surface
+create_circle_surface = create_nurbs_circle_surface
+create_cylinder_surface = create_nurbs_cylinder_surface
+create_sphere_surface = create_nurbs_sphere_surface
+create_torus_surface = create_nurbs_torus_surface
 
 # Metaball
 def create_metaball():
@@ -772,8 +739,7 @@ def create_text_object():
     bpy.ops.object.text_add()
     return active_object()
 
-def create_text():
-    return create_text_object()
+create_text = create_text_object
 
 #endregion
 #region OBJECTS - CONSTRAINTS
@@ -856,8 +822,7 @@ def add_maintain_volume_constraint(ref = None, name = ""):
 def add_transform_constraint(ref = None, name = ""):
     return add_constraint('TRANSFORM', ref, name)
 
-def add_transformation_constraint(ref = None, name = ""):
-    return add_constraint('TRANSFORM', ref, name)
+add_transformation_constraint = add_transform_constraint
 
 def add_transform_cache_constraint(ref = None, name = ""):
     return add_constraint('TRANSFORM_CACHE', ref, name)
@@ -911,44 +876,31 @@ def get_mode():
 def set_object_mode(ref=None):
     set_mode(ref, 'OBJECT')
 
-def object_mode(ref=None):
-    set_object_mode(ref)
-
 def set_edit_mode(ref=None):
     set_mode(ref, 'EDIT')
-
-def edit_mode(ref=None):
-    set_edit_mode(ref)
 
 def set_sculpt_mode(ref=None):
     set_mode(ref, 'SCULPT')
 
-def sculpt_mode(ref=None):
-    set_sculpt_mode(ref)
-
 def set_vertex_paint_mode(ref=None):
     set_mode(ref, 'VERTEX_PAINT')
-
-def vertex_paint_mode(ref=None):
-    set_vertex_paint_mode(ref)
 
 def set_weight_paint_mode(ref=None):
     set_mode(ref, 'WEIGHT_PAINT')
 
-def weight_paint_mode(ref=None):
-    set_weight_paint_mode(ref)
-
 def set_texture_paint_mode(ref=None):
     set_mode(ref, 'TEXTURE_PAINT')
-
-def texture_paint_mode(ref=None):
-    set_texture_paint_mode(ref)
 
 def set_pose_mode(ref=None):
     set_mode(ref, 'POSE')
 
-def pose_mode(ref=None):
-    set_pose_mode(ref) 
+object_mode = set_object_mode
+edit_mode = set_edit_mode
+sculpt_mode = set_sculpt_mode
+vertex_paint_mode = set_vertex_paint_mode
+weight_paint_mode = set_weight_paint_mode
+texture_paint_mode = set_texture_paint_mode
+pose_mode = set_pose_mode
 
 #endregion
 #region SCENES
@@ -961,22 +913,10 @@ def hide_object(ref=None):
     for obj in objs:
         obj.hide_set(True)
 
-def hide(ref = None):
-    hide_object(ref)
-
 def show_object(ref = None):
     objs = get_objects(ref)
     for obj in objs:
         obj.hide_set(False)
-
-def show(ref = None):
-    show_object(ref)
-
-def unhide(ref = None):
-    show_object(ref)
-
-def unhide_object(ref = None):
-    show_object(ref)
 
 def hide_in_viewport(ref):
     objs = get_objects(ref)
@@ -988,9 +928,6 @@ def show_in_viewport(ref):
     for obj in objs:
         obj.hide_viewport = False
 
-def unhide_in_viewport(ref):
-    show_in_viewport(ref)
-
 def hide_in_render(ref):
     objs = get_objects(ref)
     for obj in objs:
@@ -1001,8 +938,12 @@ def show_in_render(ref):
     for obj in objs:
         obj.hide_render = False
 
-def unhide_in_render(ref):
-    show_in_render(ref)
+hide = hide_object
+show = show_object
+unhide = show_object
+unhide_object = show_object
+unhide_in_viewport = show_in_viewport
+unhide_in_render = show_in_render
 
 def display_as_bounds(ref):
     objs = get_objects(ref)
@@ -1102,62 +1043,32 @@ def translate_along_axis(val, axis, ref = None):
         obj.location[1] += (val * axis[1])
         obj.location[2] += (val * axis[2])
 
-def move_along_axis(val, axis, ref = None):
-    translate_along_axis(val, axis, ref)
 
 def translate_along_x(val, ref = None):
     translate_along_axis(val, Vector((1.0,0.0,0.0)), ref)
 
-def move_along_x(val, ref = None):
-    translate_along_x(val, ref)
-
 def translate_along_y(val, ref = None):
     translate_along_axis(val, Vector((0.0,1.0,0.0)), ref)
-
-def move_along_y(val, ref = None):
-    translate_along_y(val, ref)
 
 def translate_along_z(val, ref = None):
     translate_along_axis(val, Vector((0.0,0.0,1.0)), ref)
 
-def move_along_z(val, ref = None):
-    translate_along_z(val, ref)
-
-def translate_along_global_x(val, ref = None):
-    translate_along_x(val, ref)
-
-def move_along_global_x(val, ref = None):
-    translate_along_x(val, ref)
-
-def translate_along_global_y(val, ref = None):
-    translate_along_y(val, ref)
-
-def move_along_global_y(val, ref = None):
-    translate_along_y(val, ref)
-
-def translate_along_global_z(val, ref = None):
-    translate_along_z(val, ref)
-
-def move_along_global_z(val, ref = None):
-    translate_along_z(val, ref)
-
-def translate_in_x(val, ref = None):
-    translate_along_x(val, ref)
-
-def move_in_x(val, ref = None):
-    translate_along_x(val, ref)
-
-def translate_in_y(val, ref = None):
-    translate_along_y(val, ref)
-
-def move_in_y(val, ref = None):
-    translate_along_y(val, ref)
-
-def translate_in_z(val, ref = None):
-    translate_along_z(val, ref)
-
-def move_in_z(val, ref = None):
-    translate_along_z(val, ref)
+move_along_axis = translate_along_axis
+move_in_x = translate_along_x
+move_in_y = translate_along_y
+move_in_z = translate_along_z
+move_along_x = translate_along_x
+move_along_y = translate_along_y
+move_along_z = translate_along_z
+move_along_global_x = translate_along_x
+move_along_global_y = translate_along_y
+move_along_global_z = translate_along_z
+translate_in_x = translate_along_x
+translate_in_y = translate_along_y
+translate_in_z = translate_along_z
+translate_along_global_x = translate_along_x
+translate_along_global_y = translate_along_y
+translate_along_global_z = translate_along_z
 
 def translate_along_local_axis(val, axis, ref = None):
     objs = make_obj_list(ref)
@@ -1172,20 +1083,15 @@ def translate_along_local_axis(val, axis, ref = None):
 def translate_along_local_x(val, ref = None):
     translate_along_local_axis(val, Vector((1.0,0.0,0.0)), ref)
 
-def move_along_local_x(val, ref = None):
-    translate_along_local_x(val, ref)
-
 def translate_along_local_y(val, ref = None):
     translate_along_local_axis(val, Vector((0.0,1.0,0.0)), ref)
-
-def move_along_local_y(val, ref = None):
-    translate_along_local_y(val, ref)
 
 def translate_along_local_z(val, ref = None):
     translate_along_local_axis(val, Vector((0.0,0.0,1.0)), ref)
 
-def move_along_local_z(val, ref = None):
-    translate_along_local_z(val, ref)
+move_along_local_x = translate_along_local_x
+move_along_local_y = translate_along_local_y
+move_along_local_z = translate_along_local_z
 
 # Rotations:
 
@@ -1222,23 +1128,12 @@ def rotate_around_global_y(deg, ref = None, point = None):
 def rotate_around_global_z(deg, ref = None, point = None):
     rotate_around_axis(deg, Vector((0.0,0.0,1.0)), ref, point)
 
-def rotate_around_x(deg, ref = None,point = None):
-    rotate_around_global_x(deg, ref, point)
-
-def rotate_around_y(deg, ref = None,point = None):
-    rotate_around_global_y(deg, ref, point)
-
-def rotate_around_z(deg, ref = None,point = None):
-    rotate_around_global_z(deg, ref, point)
-
-def rotate_in_x(deg, ref = None,point = None):
-    rotate_around_global_x(deg, ref, point)
-
-def rotate_in_y(deg, ref = None,point = None):
-    rotate_around_global_y(deg, ref, point)
-
-def rotate_in_z(deg, ref = None,point = None):
-    rotate_around_global_z(deg, ref, point)
+rotate_in_x = rotate_around_global_x
+rotate_in_y = rotate_around_global_y
+rotate_in_z = rotate_around_global_z
+rotate_around_x = rotate_around_global_x
+rotate_around_y = rotate_around_global_y
+rotate_around_z = rotate_around_global_z
 
 def rotate_around_local_axis(deg, axis = Vector(), ref = None, point = None):
     objs = make_obj_list(ref)
@@ -1319,23 +1214,12 @@ def scale_along_y(val, ref = None, point = None):
 def scale_along_z(val, ref = None, point = None):
     scale_along_axis(val, Vector((0.0, 0.0, 1.0)), ref, point)
 
-def scale_along_local_x(val, ref = None, point = None):
-    scale_along_axis(val, Vector((1.0, 0.0, 0.0)), ref, point)
-
-def scale_along_local_y(val, ref = None, point = None):
-    scale_along_axis(val, Vector((0.0, 1.0, 0.0)), ref, point)
-
-def scale_along_local_z(val, ref = None, point = None):
-    scale_along_axis(val, Vector((0.0, 0.0, 1.0)), ref, point)
-
-def scale_in_x(val, ref = None, point = None):
-    scale_along_axis(val, Vector((1.0, 0.0, 0.0)), ref, point)
-
-def scale_in_y(val, ref = None, point = None):
-    scale_along_axis(val, Vector((0.0, 1.0, 0.0)), ref, point)
-
-def scale_in_z(val, ref = None, point = None):
-    scale_along_axis(val, Vector((0.0, 0.0, 1.0)), ref, point)
+scale_in_x = scale_along_x
+scale_in_y = scale_along_y
+scale_in_z = scale_along_z
+scale_along_local_x = scale_along_x
+scale_along_local_y = scale_along_y
+scale_along_local_z = scale_along_z
 
 def scale_along_global_axis(val, axis, ref = None, point = None):
     objs = make_obj_list(ref)
@@ -1501,6 +1385,7 @@ def cursor_to_world_origin():
 def cursor_to_selection():
     bpy.ops.view3d.snap_cursor_to_selected()
 
+#NOTE: This seems like it should be bpy.ops.view3d.snap_cursor_to_active
 def cursor_to_active():
     bpy.ops.view3d.snap_cursor_to_selected()
 
@@ -1549,17 +1434,11 @@ def set_geometry_to_origin(ref = None):
         select_object(objref)
     bpy.ops.object.origin_set(type='GEOMETRY_ORIGIN')
 
-def geometry_to_origin(ref = None):
-    set_geometry_to_origin(ref)
-
 def set_origin_to_geometry(ref = None):
     objref = get_object(ref)
     if objref is not None:
         select_object(objref)
     bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY')
-
-def origin_to_geometry(ref = None):
-    set_origin_to_geometry(ref)
 
 def set_origin_to_cursor(ref = None):
     objref = get_object(ref)
@@ -1567,17 +1446,11 @@ def set_origin_to_cursor(ref = None):
         select_object(objref)
     bpy.ops.object.origin_set(type='ORIGIN_CURSOR')
 
-def origin_to_cursor(ref = None):
-    set_origin_to_cursor(ref)
-
 def set_origin_to_centermass_surface(ref = None):
     objref = get_object(ref)
     if objref is not None:
         select_object(objref)
     bpy.ops.object.origin_set(type='ORIGIN_CENTER_OF_MASS')
-
-def origin_to_centermass_surface(ref = None):
-    set_origin_to_centermass_surface(ref)
 
 def set_origin_to_centermass_volume(ref = None):
     objref = get_object(ref)
@@ -1585,8 +1458,11 @@ def set_origin_to_centermass_volume(ref = None):
         select_object(objref)
     bpy.ops.object.origin_set(type='ORIGIN_CENTER_OF_VOLUME')
 
-def origin_to_centermass_volume(ref = None):
-    set_origin_to_centermass_volume(ref)
+geometry_to_origin = set_geometry_to_origin
+origin_to_geometry = set_origin_to_geometry
+origin_to_cursor = set_origin_to_cursor
+origin_to_centermass_surface = set_origin_to_centermass_surface
+origin_to_centermass_volume = set_origin_to_centermass_volume
 #endregion
 #region SHADING
 def shade_object_smooth(ref = None):
@@ -1603,9 +1479,6 @@ def shade_object_smooth(ref = None):
     select_object(objref)
     bpy.ops.object.shade_smooth()
 
-def shade_smooth(ref = None):
-    shade_object_smooth(ref)
-
 def shade_object_flat(ref = None):
     objref = None
     if ref is not None:
@@ -1620,8 +1493,8 @@ def shade_object_flat(ref = None):
     select_object(objref)
     bpy.ops.object.shade_flat()
 
-def shade_flat(ref = None):
-    shade_object_flat(ref)
+shade_smooth = shade_object_smooth
+shade_flat = shade_object_flat
 
 def set_smooth_angle(ref, degrees = 60):
     objref = None
@@ -1647,9 +1520,6 @@ def light_power(val = 0, ref = None):
     for o in objlist:
         o.data.energy = val
 
-def light_intensity(val = 0, ref = None):
-    light_power(val,ref)
-
 def light_power_add(val = 0, ref = None):
     objlist = []
     if ref is None:
@@ -1658,9 +1528,6 @@ def light_power_add(val = 0, ref = None):
         objlist = [ref]
     for o in objlist:
         o.data.energy += val
-
-def light_intensity_add(val = 0, ref = None):
-    light_power_add(val,ref)
 
 def light_power_multiply(val = 0, ref = None):
     objlist = []
@@ -1671,8 +1538,9 @@ def light_power_multiply(val = 0, ref = None):
     for o in objlist:
         o.data.energy *= val
 
-def light_intensity_multiply(val = 0, ref = None):
-    light_power_multiply(val,ref)
+light_intensity = light_power
+light_intensity_add = light_power_add
+light_intensity_multiply = light_power_multiply
 #endregion
 #region MESHES
 def create_mesh(name):
@@ -1692,9 +1560,6 @@ def get_edges(ref):
         return get_object(ref).data.edges
     else:
         return ref.data.edges
-
-def get_faces(ref):
-    return get_polygons(ref)
 
 def get_polygons(ref):
     if is_string(ref):
@@ -1719,9 +1584,6 @@ def get_selected_vertices(ref = None):
     bpy.ops.object.mode_set(mode=tmp_mode)
     return selected_vertices
 
-def get_selected_verts(ref = None):
-    return get_selected_vertices(ref)
-
 def get_selected_edges(ref = None):
     ref = get_object(ref)
     tmp_mode = ref.mode
@@ -1739,6 +1601,9 @@ def get_selected_faces(ref = None):
     selected_faces = [f for f in ref.data.polygons if f.select]
     bpy.ops.object.mode_set(mode=tmp_mode)
     return selected_faces
+
+get_faces = get_polygons
+get_selected_verts = get_selected_vertices
 #endregion
 #region CURVES
 def get_curve_points(ref = None):
@@ -1811,11 +1676,8 @@ def get_active_shape_key(ref = None):
     objref = get_object(ref)
     return objref.active_shape_key
 
-def get_shape_keys(ref = None):
-    return get_all_shape_keys(ref)
-
-def remove_shape_keys(ref = None):
-    return remove_all_shape_keys(ref)
+get_shape_keys = get_all_shape_keys
+remove_shape_keys = remove_all_shape_keys
 #endregion
 #region PARTICLE SYSTEMS
 def get_particle_systems(ref):
@@ -1913,9 +1775,6 @@ def get_collection(ref = None):
         else:
             return ref
 
-def get_col(ref = None):
-    return get_collection(ref)
-
 def get_active_collection():
     return bpy.context.view_layer.active_layer_collection.collection
 
@@ -1928,16 +1787,9 @@ def set_active_collection(ref):
     hir = bpy.context.view_layer.layer_collection
     search_layer_collection_in_hierarchy_and_set_active(colref, hir)
 
-def select_collection(ref):
-    set_active_collection(ref)
-
 def hide_collection_viewport(ref=None):
     col = get_collection(ref)
     col.hide_viewport = True
-
-# most people will probably expect the viewport collection to be hidden with this function name
-def hide_collection(ref=None):
-    hide_collection_viewport(ref)
 
 def hide_collection_render(ref=None):
     col = get_collection(ref)
@@ -1951,10 +1803,6 @@ def show_collection_viewport(ref=None):
     col = get_collection(ref)
     col.hide_viewport = False
 
-# most people will probably expect the viewport collection to be unhidden with this function name
-def show_collection(ref=None):
-    show_collection_viewport(ref)
-
 def show_collection_render(ref=None):
     col = get_collection(ref)
     col.hide_render = False
@@ -1963,18 +1811,17 @@ def show_collection_select(ref=None):
     col = get_collection(ref)
     col.hide_select = False
 
-def unhide_collection_viewport(ref=None):
-    show_collection_viewport(ref)
-
+get_col = get_collection
+select_collection = set_active_collection
 # most people will probably expect the viewport collection to be hidden with this function name
-def unhide_collection(ref=None):
-    unhide_collection_viewport(ref)
-
-def unhide_collection_render(ref=None):
-    show_collection_render(ref)
-
-def unhide_collection_select(ref=None):
-    show_collection_select(ref)
+hide_collection = hide_collection_viewport
+# most people will probably expect the viewport collection to be unhidden with this function name
+show_collection = show_collection_viewport
+unhide_collection_viewport =  show_collection_viewport
+# most people will probably expect the viewport collection to be hidden with this function name
+unhide_collection = show_collection_viewport
+unhide_collection_render = show_collection_render
+unhide_collection_select = show_collection_select
 
 # Dev Function
 def search_layer_collection_in_hierarchy_and_set_active(colref, hir) :
@@ -1988,8 +1835,7 @@ def search_layer_collection_in_hierarchy_and_set_active(colref, hir) :
 def get_all_collections():
     return bpy.data.collections
 
-def get_list_of_collections():
-    return get_all_collections()
+get_list_of_collections = get_all_collections
 
 def link_object_to_collection(ref, col):
     if is_string(col):
@@ -2122,9 +1968,6 @@ def remove_material_from_object(ref, matname):
     if matname in objref.data.materials:
         objref.data.materials.pop(index=matindex)
 
-def remove_material(ref, matname):
-    return remove_material_from_object(ref, matname)
-
 def remove_materials(ref = None):
     objrefs = get_objects(ref)
     for o in objrefs:
@@ -2134,9 +1977,6 @@ def remove_materials(ref = None):
                 names.append(m.name)
             for n in names:
                 remove_material_from_object(o,n)
-                
-def remove_all_materials(ref = None):
-    remove_materials(ref)
 
 def remove_unused_material_slots(ref = None):
     objrefs = get_objects(ref)
@@ -2147,8 +1987,9 @@ def remove_unused_material_slots(ref = None):
         for item in tmp:
             data.materials.append(item[1])
 
-def remove_unused_slots(ref = None):
-    remove_unused_material_slots(ref)
+remove_material = remove_material_from_object
+remove_all_materials = remove_materials
+remove_unused_slots = remove_unused_material_slots
 
 def get_all_materials():
     return bpy.data.materials
@@ -2183,8 +2024,7 @@ def get_material_names_from_object(ref):
 def set_material_use_nodes(matref, value):
     matref.use_nodes = value
 
-def set_material_to_use_nodes(matref=None, value=None):
-    set_material_use_nodes(matref,value)
+set_material_to_use_nodes = set_material_use_nodes
 
 def get_material_nodes(ref):
     mat = get_material(ref)
@@ -2273,9 +2113,6 @@ def get_texture(ref):
 def get_all_textures():
     return bpy.data.textures
 
-def get_list_of_textures():
-    return get_all_textures()
-
 def rename_texture(ref, name):
     texref = get_texture(ref)
     if name is not None:
@@ -2300,8 +2137,8 @@ def get_image(ref):
 def get_all_images():
     return bpy.data.images
 
-def get_list_of_images():
-    return get_all_images()
+get_list_of_textures = get_all_textures
+get_list_of_images = get_all_images
 
 def rename_image(ref, name):
     imgref = get_image(ref)
@@ -2363,17 +2200,14 @@ def remove_modifiers(ref = None):
         for m in o.modifiers:
             o.modifiers.remove(m)
 
-def remove_all_modifiers(ref = None):
-    remove_modifiers(ref)
-
 def apply_all_modifiers(ref = None):
     objref = get_object(ref)
     select_object(objref)
     for mod in objref.modifiers:
         bpy.ops.object.modifier_apply(modifier=mod.name)
 
-def apply_modifiers(ref = None):
-    apply_all_modifiers(ref)
+remove_all_modifiers = remove_modifiers
+apply_modifiers = apply_all_modifiers
 
 # Specific Modifiers
 def add_data_transfer(ref=None, modname = "DataTransfer"):
@@ -2547,20 +2381,11 @@ def add_force_field_physics(ref=None):
     if objref.field.type == 'NONE':
         bpy.ops.object.forcefield_toggle()
 
-def add_collision_physics(ref=None):
-    add_collision(ref)
-
-def add_cloth_physics(ref=None):
-    add_cloth(ref)
-
-def add_dynamic_paint_physics(ref=None):
-    add_dynamic_paint(ref)
-
-def add_soft_body_physics(ref=None):
-    add_soft_body(ref)
-
-def add_fluid_physics(ref=None):
-    add_fluid(ref)
+add_collision_physics = add_collision
+add_cloth_physics = add_cloth
+add_dynamic_paint_physics = add_dynamic_paint
+add_soft_body_physics = add_soft_body
+add_fluid_physics = add_fluid
 
 def add_rigid_body_physics(ref=None):
     objref = get_object(ref)
@@ -3306,8 +3131,7 @@ def fluid_domain_adapt_threshold(value):
 def collision_use(value = True):
     bpy.context.object.collision.use = value
 
-def use_collision(value = True):
-    collision_use(value)
+use_collision = collision_use
 
 def collision_field_absorption(value):
     val = float(value)
@@ -3399,11 +3223,6 @@ def make_obj_list(ref):
     return get_objects(ref)
 #endregion
 #region MISC
-def clear_unwanted_data():
-    delete_unused_data()
-def clear_unused_data():
-    #bpy.ops.outliner.orphans_purge()
-    delete_unused_data()
 def delete_unused_data():
     #bpy.data.orphans_purge() # is considered experimental
     for block in bpy.data.lights:
@@ -3433,6 +3252,10 @@ def delete_unused_data():
     for block in bpy.data.images:
         if block.users == 0:
             bpy.data.images.remove(block)
+
+clear_unwanted_data = delete_unused_data
+clear_unused_data = delete_unused_data
+
 def debug_test():
     print("EasyBPY debug output")
 #endregion
@@ -3693,8 +3516,7 @@ def convert_suffixes_underscore():
     suffix_convert_dataset(bpy.data.images)
     suffix_convert_dataset(bpy.data.materials)
 
-def convert_suffixes():
-    convert_suffixes_underscore()
+convert_suffixes = convert_suffixes_underscore
 
 def add_prefix_to_name(ref, prefix, delim="_"):
     objlist = make_obj_list(ref)
@@ -3728,8 +3550,7 @@ def fix_node_duplicates():
         ngnodes = ng.nodes
         replace_duplicate_nodes(ngnodes)
 
-def fix_duplicate_nodes():
-    fix_node_duplicates()
+fix_duplicate_nodes = fix_node_duplicates
 
 def random_visibility_keyframes(objects = None, phase_min = 0, phase_max = 75, sustain_min = 5, sustain_max = 100, chance = 6):
     # Getting important information:
